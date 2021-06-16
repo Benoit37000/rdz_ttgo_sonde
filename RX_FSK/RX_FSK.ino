@@ -3266,6 +3266,7 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
           (float)s->dir, (int)s->sats, -((float)s->rssi / 2)
          );
   w += strlen(w);
+   Serial.println(w);
 
   if ( TYPE_IS_DFM(s->type) || TYPE_IS_METEO(s->type) || s->type == STYPE_MP3H ) {
     // send frame as gps timestamp for these sonde, identical to autorx
@@ -3334,8 +3335,8 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
   client->println(rs_msg);
   Serial.println(rs_msg);
   shState = SH_CONN_WAITACK;
-  //String response = client->readString();
-  //Serial.println(response);
+  String response = client->readString();
+  Serial.println(response);
 }
 // End of sondehub v2 related codes
 #endif
