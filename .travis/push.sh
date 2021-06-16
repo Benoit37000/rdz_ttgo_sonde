@@ -10,7 +10,7 @@ generate_website_index() {
   echo '<link rel="stylesheet" href="/assets/css/style.css?v=a43710928bb200926b87aed147b540673ccb0378">' >> download.html
   echo "</head><body>" >> download.html
   echo '<div class="wrapper"><header><h1><a href="https://dl9rdz.github.io/rdz_ttgo_sonde/">rdz_ttgo_sonde</a></h1><p></p>' >> download.html
-  echo '<p class="view"><a href="https://github.com/dl9rdz/rdz_ttgo_sonde">View the Project on GitHub <small>dl9rdz/rdz_ttgo_sonde</small></a></p>' >> download.html
+  echo '<p class="view"><a href="https://github.com/Benoit37000/rdz_ttgo_sonde">View the Project on GitHub <small>rdz_ttgo_sonde</small></a></p>' >> download.html
   echo '</header><section><h1 id="rdz_ttgo_sonde">rdz_ttgo_sonde</h1>' >> download.html
   echo "<h2>Master repository</h2><ul>" >> download.html
   for i in `ls master|sort -r`; do
@@ -51,7 +51,7 @@ commit_website_files() {
   echo "On branch $BRANCH"
   echo "Version $VERSION"
   cd /tmp
-  git clone https://github.com/dl9rdz/rdz_ttgo_sonde.git -b gh-pages
+  git clone https://github.com/Benoit37000/rdz_ttgo_sonde.git -b gh-pages
   cd rdz_ttgo_sonde
   mkdir -p master
   mkdir -p devel
