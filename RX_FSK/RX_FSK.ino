@@ -31,6 +31,7 @@
 float latlocal= 48.80458;
 float longlocal= 1.89878;
 
+#define FEATURE_SONDEHUB 1
 
 
 
