@@ -1,7 +1,7 @@
 #!/bin/sh
 setup_git() {
-  git config --global user.email "dl9rdz@darc.de"
-  git config --global user.name "dl9rdz (via Travis CI)"
+ git config --global user.email "none@dnone.de"
+  git config --global user.name "Benoit37000 (via Travis CI)"
 }
 generate_website_index() {
   echo "<html><head>" > download.html
@@ -64,7 +64,7 @@ commit_website_files() {
   git commit --message "Travis build: $TRAVIS_BUILD_NUMBER"
 }
 upload_files() {
-  git remote add origin-pages https://${GITHUB_API_KEY}@github.com/dl9rdz/rdz_ttgo_sonde.git > /dev/null 2>&1
+  git remote add origin-pages https://${travis}@github.com/Benoit37000/rdz_ttgo_sonde.git 
   git push --quiet --set-upstream origin-pages gh-pages 
 }
 setup_git
