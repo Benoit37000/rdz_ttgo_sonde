@@ -30,10 +30,7 @@
 #define NOGPS 1
 float latlocal= 48.79667;
 float longlocal= 1.98184;
-
 //#define FEATURE_SONDEHUB 1
-
-
 
 int e;
 
