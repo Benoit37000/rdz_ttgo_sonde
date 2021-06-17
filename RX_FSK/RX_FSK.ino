@@ -1,7 +1,5 @@
 #include <axp20x.h>
-
 #include "features.h"
-
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <ESPAsyncWebServer.h>
