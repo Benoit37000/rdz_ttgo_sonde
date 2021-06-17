@@ -3235,7 +3235,10 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
 
   memset(rs_msg, 0, MSG_SIZE);
   w = rs_msg;
+  String stringOne = s->ser;
+  String reformat = StringOne.substring(0, 3)+"-"+stringOne.substring(3, 5)+"-"+ stringOne.substring(5, 9); 
 
+  
   sprintf(w,
           "[ {"
           "\"software_name\": \"%s\","
@@ -3256,7 +3259,7 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
           "\"rssi\": %.1f,",
           version_name, version_id, conf->callsign,
           timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec,
-          manufacturer_string[s->type], s->ser,
+          manufacturer_string[s->type], reformat,
           ts.tm_year + 1900, ts.tm_mon + 1, ts.tm_mday, ts.tm_hour, ts.tm_min, ts.tm_sec + s->sec,
           (float)s->lat, (float)s->lon, (float)s->alt, (float)s->freq, (float)s->hs, (float)s->vs,
           (float)s->dir, (int)s->sats, -((float)s->rssi / 2)
