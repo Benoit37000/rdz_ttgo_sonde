@@ -67,6 +67,8 @@ WiFiClient shclient;	// Sondehub v2
 unsigned long time_last_update = 0;
 #endif
 
+
+
 // KISS over TCP for communicating with APRSdroid
 WiFiServer tncserver(14580);
 WiFiClient tncclient;
