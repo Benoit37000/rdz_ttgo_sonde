@@ -30,7 +30,7 @@
 #define NOGPS 1
 float latlocal= 48.79667;
 float longlocal= 1.98184;
-//#define FEATURE_SONDEHUB 1
+
 
 int e;
 
@@ -3195,7 +3195,7 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
   if (*s->ser == 0) return;	// Don't send anything without serial number
   if (((int)s->lat == 0) && ((int)s->lon == 0)) return;	// Sometimes these values are zeroes. Don't send those to the sondehub
   if ((int)s->alt > 50000) return;	// If alt is too high don't send to SondeHub
-  //if ((int)s->sats < 3) return;	// If not enough sats don't send to SondeHub
+  if ((int)s->sats < 0) return;	// If not enough sats don't send to SondeHub
 
   // If not connected to sondehub, try reconnecting.
   // TODO: do this outside of main loop
