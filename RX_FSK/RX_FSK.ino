@@ -3235,7 +3235,7 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
 
   memset(rs_msg, 0, MSG_SIZE);
   w = rs_msg;
-  char stringOne[12] = s->ser;
+  char stringOne = s->ser;
  // String reformat = stringOne.substring(0, 3)+"-"+stringOne.substring(3, 5)+"-"+ stringOne.substring(5, 9); 
   //String reformat = stringOne[0]+ stringOne[1]+ stringOne[2]+"-"+stringOne[3]+ stringOne[4]+"-"+ stringOne[5]+ stringOne[6]+ stringOne[7]+ stringOne[8]); 
   char reformat[11]={};
