@@ -3193,9 +3193,9 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
   }
 
   // Check if current sonde data is valid. If not, don't do anything....
- // if (*s->ser == 0) return;	// Don't send anything without serial number
- // if (((int)s->lat == 0) && ((int)s->lon == 0)) return;	// Sometimes these values are zeroes. Don't send those to the sondehub
- // if ((int)s->alt > 50000) return;	// If alt is too high don't send to SondeHub
+  if (*s->ser == 0) return;	// Don't send anything without serial number
+  if (((int)s->lat == 0) && ((int)s->lon == 0)) return;	// Sometimes these values are zeroes. Don't send those to the sondehub
+  if ((int)s->alt > 50000) return;	// If alt is too high don't send to SondeHub
   //if ((int)s->sats < 3) return;	// If not enough sats don't send to SondeHub
 
   // If not connected to sondehub, try reconnecting.
