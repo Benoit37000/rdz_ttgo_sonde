@@ -31,7 +31,6 @@
 float latlocal= 48.79667;
 float longlocal= 1.98184;
 
-
 int e;
 
 enum MainState { ST_DECODER, ST_SPECTRUM, ST_WIFISCAN, ST_UPDATE, ST_TOUCHCALIB };
