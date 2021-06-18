@@ -1,5 +1,7 @@
 #include <axp20x.h>
+
 #include "features.h"
+
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <ESPAsyncWebServer.h>
@@ -24,11 +26,6 @@
 #endif
 #include "esp_heap_caps.h"
 //#define ESP_MEM_DEBUG 1
-#include <ArduinoOTA.h>
-//#define NOGPS 1
-float latlocal= 45.79667;
-float longlocal= 2.98184;
-
 int e;
 
 enum MainState { ST_DECODER, ST_SPECTRUM, ST_WIFISCAN, ST_UPDATE, ST_TOUCHCALIB };
@@ -41,7 +38,6 @@ AXP20X_Class axp;
 #define PMU_IRQ             35
 SemaphoreHandle_t axpSemaphore;
 bool pmu_irq = false;
-
 
 String updateHost = "rdzsonde.mooo.com";
 int updatePort = 80;
@@ -64,8 +60,6 @@ WiFiClient client;
 WiFiClient shclient;	// Sondehub v2
 unsigned long time_last_update = 0;
 #endif
-
-
 
 // KISS over TCP for communicating with APRSdroid
 WiFiServer tncserver(14580);
@@ -127,60 +121,6 @@ int readLine(Stream &stream, char *buffer, int maxlen) {
   }
   return n;
 }
-
-
-
-
-
-
-
-
-
-int distance()  {
-int  gpsDist;
-
-#ifdef NOGPS
-if  (  (sonde.si()->validPos&0x03)==0x03 ) {
-           float lat1= latlocal;
-          float long1= longlocal;
-          float lat2 = sonde.si()->lat;
-          float x = radians(long1 -sonde.si()->lon) * cos( radians((lat1+lat2)/2) );
-          float y = radians(lat2-lat1);
-          float d = sqrt(x*x+y*y)*6371000.0F;
-    gpsDist = (int)(d/1000);
-  } else {gpsDist = -1; } 
-
-#else
-if( gpsPos.valid && (sonde.si()->validPos&0x03)==0x03 ) {
-  float lat1 = gpsPos.lat;
-  float lat2 = sonde.si()->lat;
-  float x = radians(gpsPos.lon-sonde.si()->lon) * cos( radians((lat1+lat2)/2) );
-  float y = radians(lat2-lat1);
-  float d = sqrt(x*x+y*y)*6371000.0F;
-   gpsDist = (int)(d/1000);
-  } else {gpsDist = -1; } 
-  
-#endif
-
-
-return gpsDist;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // Replaces placeholder with LED state value
@@ -519,7 +459,7 @@ void addSondeStatus(char *ptr, int i)
   if (s->validID && (TYPE_IS_DFM(s->type) || TYPE_IS_METEO(s->type) || s->type == STYPE_MP3H) ) {
     sprintf(ptr + strlen(ptr), " (ser: %s)", s->ser);
   }
-  sprintf(ptr + strlen(ptr), "</td></tr><tr><td>QTH: %.6f,%.6f h=%.0fm  Dist=%d km</td></tr>\n", s->lat, s->lon, s->alt,distance());
+  sprintf(ptr + strlen(ptr), "</td></tr><tr><td>QTH: %.6f,%.6f h=%.0fm</td></tr>\n", s->lat, s->lon, s->alt);
   const time_t t = s->time;
   ts = *gmtime(&t);
   sprintf(ptr + strlen(ptr), "<tr><td>Frame# %d, Sats=%d, %04d-%02d-%02d %02d:%02d:%02d</td></tr>",
@@ -2465,49 +2405,6 @@ void enableNetwork(bool enable) {
 #endif
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
     connected = true;
-    
-    
-    
-    ArduinoOTA
-    .onStart([]() {
-      String type;
-      if (ArduinoOTA.getCommand() == U_FLASH)
-        type = "sketch";
-      else // U_SPIFFS
-        type = "filesystem";
-
-      // NOTE: if updating SPIFFS this would be the place to unmount SPIFFS using SPIFFS.end()
-      Serial.println("Start updating " + type);
-    })
-    .onEnd([]() {
-      Serial.println("\nEnd");
-    })
-    .onProgress([](unsigned int progress, unsigned int total) {
-      Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
-    })
-    .onError([](ota_error_t error) {
-      Serial.printf("Error[%u]: ", error);
-      if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
-      else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
-      else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
-      else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
-      else if (error == OTA_END_ERROR) Serial.println("End Failed");
-    });
-
-  ArduinoOTA.begin();
-
-  Serial.println("OTA Ready");
-  Serial.print("IP address: ");
-  Serial.println(WiFi.localIP());
-
-    
-    
-    
-    
-    
-    
-    
-    
   } else {
     MDNS.end();
     connected = false;
@@ -3067,16 +2964,7 @@ void loop() {
     lastMqttUptime = now;
   }
 #endif
-  if ( millis() > 86400*1000 ) {  ESP.restart();  }
- ArduinoOTA.handle();
 }
-
-
-
-
-
-
-
 
 #if FEATURE_SONDEHUB
 // Sondehub v2 DB related codes
@@ -3193,7 +3081,7 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
   if (*s->ser == 0) return;	// Don't send anything without serial number
   if (((int)s->lat == 0) && ((int)s->lon == 0)) return;	// Sometimes these values are zeroes. Don't send those to the sondehub
   if ((int)s->alt > 50000) return;	// If alt is too high don't send to SondeHub
-  if ((int)s->sats < 0) return;	// If not enough sats don't send to SondeHub
+  if ((int)s->sats < 4) return;	// If not enough sats don't send to SondeHub
 
   // If not connected to sondehub, try reconnecting.
   // TODO: do this outside of main loop
@@ -3236,8 +3124,7 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
 
   memset(rs_msg, 0, MSG_SIZE);
   w = rs_msg;
-  String stringOne = s->ser;
- 
+
   sprintf(w,
           "[ {"
           "\"software_name\": \"%s\","
@@ -3245,8 +3132,7 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
           "\"uploader_callsign\": \"%s\","
           "\"time_received\": \"%04d-%02d-%02dT%02d:%02d:%02d.000Z\","
           "\"manufacturer\": \"%s\","
-         // "\"serial\": \"%s\","
-	  "\"serial\": \"%c%c%c-%c%c-%c%c%c%c\","
+          "\"serial\": \"%s\","
           "\"datetime\": \"%04d-%02d-%02dT%02d:%02d:%02d.000Z\","
           "\"lat\": %.6f,"
           "\"lon\": %.6f,"
@@ -3259,13 +3145,12 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
           "\"rssi\": %.1f,",
           version_name, version_id, conf->callsign,
           timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec,
-          manufacturer_string[s->type], stringOne[0],stringOne[1],stringOne[2],stringOne[3],stringOne[4],stringOne[5],stringOne[6],stringOne[7],stringOne[8],
+          manufacturer_string[s->type], s->ser,
           ts.tm_year + 1900, ts.tm_mon + 1, ts.tm_mday, ts.tm_hour, ts.tm_min, ts.tm_sec + s->sec,
           (float)s->lat, (float)s->lon, (float)s->alt, (float)s->freq, (float)s->hs, (float)s->vs,
           (float)s->dir, (int)s->sats, -((float)s->rssi / 2)
          );
   w += strlen(w);
-   Serial.println(w);
 
   if ( TYPE_IS_DFM(s->type) || TYPE_IS_METEO(s->type) || s->type == STYPE_MP3H ) {
     // send frame as gps timestamp for these sonde, identical to autorx
@@ -3334,8 +3219,8 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
   client->println(rs_msg);
   Serial.println(rs_msg);
   shState = SH_CONN_WAITACK;
-  String response = client->readString();
-  Serial.println(response);
+  //String response = client->readString();
+  //Serial.println(response);
 }
 // End of sondehub v2 related codes
 #endif
