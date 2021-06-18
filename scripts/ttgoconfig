@@ -9,7 +9,7 @@ ttgohost = "rdzsonde.local"
 
 # usually, rdzsonde.mooo.com should be an alias for that:
 # or, more specifically:
-updatehost = "https://github.com/dl9rdz/rdz_ttgo_sonde/blob/gh-pages/{}/{}?raw=true"
+updatehost = "https://github.com/Benoit37000/rdz_ttgo_sonde/blob/gh-pages/{}/{}?raw=true"
 
 screens = ("screens1.txt", "screens2.txt", "screens3.txt")
 allfiles = ("config.txt", "qrg.txt", "networks.txt") + screens
