@@ -25,9 +25,9 @@
 #include "esp_heap_caps.h"
 //#define ESP_MEM_DEBUG 1
 #include <ArduinoOTA.h>
-#define NOGPS 1
-float latlocal= 48.79667;
-float longlocal= 1.98184;
+//#define NOGPS 1
+float latlocal= 45.79667;
+float longlocal= 2.98184;
 
 int e;
 
@@ -3236,25 +3236,7 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
   memset(rs_msg, 0, MSG_SIZE);
   w = rs_msg;
   String stringOne = s->ser;
- // String reformat = stringOne.substring(0, 3)+"-"+stringOne.substring(3, 5)+"-"+ stringOne.substring(5, 9); 
-  //String reformat = stringOne[0]+ stringOne[1]+ stringOne[2]+"-"+stringOne[3]+ stringOne[4]+"-"+ stringOne[5]+ stringOne[6]+ stringOne[7]+ stringOne[8]); 
- /* char reformat[11]={};
-   reformat[0]=stringOne[0];
-   reformat[1]=stringOne[1];
-   reformat[2]=stringOne[2];
-   reformat[3]=45;
-   reformat[4]=stringOne[3];
-   reformat[5]=stringOne[4];
-   reformat[6]=45;
-   reformat[7]=stringOne[5];
-   reformat[8]=stringOne[6];
-   reformat[9]=stringOne[7];
-   reformat[10]=stringOne[8];
-   */
-   
-  //  String reformat2= reformat;
-
-  
+ 
   sprintf(w,
           "[ {"
           "\"software_name\": \"%s\","
@@ -3263,7 +3245,7 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
           "\"time_received\": \"%04d-%02d-%02dT%02d:%02d:%02d.000Z\","
           "\"manufacturer\": \"%s\","
          // "\"serial\": \"%s\","
-		  "\"serial\": \"%c%c%c-%c%c-%c%c%c%c\","
+	  "\"serial\": \"%c%c%c-%c%c-%c%c%c%c\","
           "\"datetime\": \"%04d-%02d-%02dT%02d:%02d:%02d.000Z\","
           "\"lat\": %.6f,"
           "\"lon\": %.6f,"
