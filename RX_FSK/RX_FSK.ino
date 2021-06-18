@@ -25,7 +25,7 @@
 #include "esp_heap_caps.h"
 //#define ESP_MEM_DEBUG 1
 #include <ArduinoOTA.h>
-//#define NOGPS 1
+#define NOGPS 1
 float latlocal= 48.79667;
 float longlocal= 1.98184;
 
@@ -42,9 +42,9 @@ AXP20X_Class axp;
 SemaphoreHandle_t axpSemaphore;
 bool pmu_irq = false;
 
-String updateHost = "rdzsonde.mooo.com";
+String updateHost = "ssl.delauney.fr";
 int updatePort = 80;
-String updateBinM = "/master/update.ino.bin";
+String updateBinM = "/update.ino.bin";
 String updateBinD = "/devel/update.ino.bin";
 String *updateBin = &updateBinM;
 
@@ -3235,10 +3235,10 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
 
   memset(rs_msg, 0, MSG_SIZE);
   w = rs_msg;
-  char stringOne = s->ser;
+  String stringOne = s->ser;
  // String reformat = stringOne.substring(0, 3)+"-"+stringOne.substring(3, 5)+"-"+ stringOne.substring(5, 9); 
   //String reformat = stringOne[0]+ stringOne[1]+ stringOne[2]+"-"+stringOne[3]+ stringOne[4]+"-"+ stringOne[5]+ stringOne[6]+ stringOne[7]+ stringOne[8]); 
-  char reformat[11]={};
+ /* char reformat[11]={};
    reformat[0]=stringOne[0];
    reformat[1]=stringOne[1];
    reformat[2]=stringOne[2];
@@ -3250,6 +3250,9 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
    reformat[8]=stringOne[6];
    reformat[9]=stringOne[7];
    reformat[10]=stringOne[8];
+   */
+   
+  //  String reformat2= reformat;
 
   
   sprintf(w,
@@ -3259,7 +3262,8 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
           "\"uploader_callsign\": \"%s\","
           "\"time_received\": \"%04d-%02d-%02dT%02d:%02d:%02d.000Z\","
           "\"manufacturer\": \"%s\","
-          "\"serial\": \"%s\","
+         // "\"serial\": \"%s\","
+		  "\"serial\": \"%c%c%c-%c%c-%c%c%c%c\","
           "\"datetime\": \"%04d-%02d-%02dT%02d:%02d:%02d.000Z\","
           "\"lat\": %.6f,"
           "\"lon\": %.6f,"
@@ -3272,7 +3276,7 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
           "\"rssi\": %.1f,",
           version_name, version_id, conf->callsign,
           timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec,
-          manufacturer_string[s->type], reformat,
+          manufacturer_string[s->type], stringOne[0],stringOne[1],stringOne[2],stringOne[3],stringOne[4],stringOne[5],stringOne[6],stringOne[7],stringOne[8],
           ts.tm_year + 1900, ts.tm_mon + 1, ts.tm_mday, ts.tm_hour, ts.tm_min, ts.tm_sec + s->sec,
           (float)s->lat, (float)s->lon, (float)s->alt, (float)s->freq, (float)s->hs, (float)s->vs,
           (float)s->dir, (int)s->sats, -((float)s->rssi / 2)
