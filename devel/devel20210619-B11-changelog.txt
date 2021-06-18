@@ -1,2 +1,3 @@
 Update RX_FSK.ino
 Update ttgoconfig
+Update push.sh
