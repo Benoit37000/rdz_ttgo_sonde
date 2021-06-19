@@ -33,8 +33,8 @@ int e;
 #include <ArduinoOTA.h>
 //#define NOGPS 1
 
-float latlocal= 45.79667;
-float longlocal= 2.98184;
+float latlocal= 48.01287;
+float longlocal= 2.15987;
 
 
 enum MainState { ST_DECODER, ST_SPECTRUM, ST_WIFISCAN, ST_UPDATE, ST_TOUCHCALIB };
@@ -68,6 +68,7 @@ WiFiClient client;
 #define SONDEHUB_MOBILE_STATION_UPDATE_TIME (30*1000) // 30 sec
 WiFiClient shclient;	// Sondehub v2
 unsigned long time_last_update = 0;
+unsigned long time_last_update2 = 0;
 #endif
 
 // KISS over TCP for communicating with APRSdroid
@@ -3184,13 +3185,14 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
     if (shState == SH_CONN_WAITACK && cnt > 11 && strncmp(rs_msg, "HTTP/1", 6) == 0) {
       shState = SH_CONN_IDLE;
     }
+       
   }
 
   // Check if current sonde data is valid. If not, don't do anything....
   if (*s->ser == 0) return;	// Don't send anything without serial number
   if (((int)s->lat == 0) && ((int)s->lon == 0)) return;	// Sometimes these values are zeroes. Don't send those to the sondehub
   if ((int)s->alt > 50000) return;	// If alt is too high don't send to SondeHub
-  if ((int)s->sats < 4) return;	// If not enough sats don't send to SondeHub
+  //if ((int)s->sats < 4) return;	// If not enough sats don't send to SondeHub
 
   // If not connected to sondehub, try reconnecting.
   // TODO: do this outside of main loop
@@ -3317,6 +3319,14 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
            );
   }
 
+
+
+
+unsigned long time_now2 = millis();
+unsigned long time_delta2 = time_now2 - time_last_update2;
+ if  (time_delta2 >=  SONDEHUB_MOBILE_STATION_UPDATE_TIME )
+ { 
+
   client->println("PUT /sondes/telemetry HTTP/1.1");
   client->print("Host: ");
   client->println(conf->host);
@@ -3330,6 +3340,9 @@ void sondehub_send_data(WiFiClient *client, SondeInfo *s, struct st_sondehub *co
   shState = SH_CONN_WAITACK;
   //String response = client->readString();
   //Serial.println(response);
+time_last_update2 = time_now2;
+}
+
 }
 // End of sondehub v2 related codes
 #endif
