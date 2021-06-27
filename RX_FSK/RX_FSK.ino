@@ -33,8 +33,8 @@ int e;
 #include <ArduinoOTA.h>
 //#define NOGPS 1
 
-float latlocal= 48.01287;
-float longlocal= 2.15987;
+float latlocal= 45.452;
+float longlocal= 2.1258;
 
 
 enum MainState { ST_DECODER, ST_SPECTRUM, ST_WIFISCAN, ST_UPDATE, ST_TOUCHCALIB };
@@ -69,6 +69,7 @@ WiFiClient client;
 WiFiClient shclient;	// Sondehub v2
 unsigned long time_last_update = 0;
 unsigned long time_last_update2 = 0;
+unsigned long time_last_update_ota = 0;
 #endif
 
 // KISS over TCP for communicating with APRSdroid
@@ -523,9 +524,8 @@ void addSondeStatus(char *ptr, int i)
             s->burstKT, s->launchKT, s->countKT, ((uint16_t)s->frame - s->crefKT));
   }
   sprintf(ptr + strlen(ptr), "<tr><td><a target=\"_empty\" href=\"geo:%.6f,%.6f\">GEO-App</a> - ", s->lat, s->lon);
-  sprintf(ptr + strlen(ptr), "<a target=\"_empty\" href=\"https://wetterson.de/karte/?%s\">wetterson.de</a> - ", s->id);
   sprintf(ptr + strlen(ptr), "<a target=\"_empty\" href=\"https://radiosondy.info/sonde_archive.php?sondenumber=%s\">radiosondy.info</a> - ", s->id);
-  sprintf(ptr + strlen(ptr), "<a target=\"_empty\" href=\"https://tracker.sondehub.org/%s\">SondeHub Tracker</a> - ", s->id);
+  sprintf(ptr + strlen(ptr), "<a target=\"_empty\" href=\"https://tracker.sondehub.org/%s\">SondeHub Tracker</a> - ", s->ser);
   sprintf(ptr + strlen(ptr), "<a target=\"_empty\" href=\"https://www.openstreetmap.org/?mlat=%.6f&mlon=%.6f&zoom=14\">OSM</a> - ", s->lat, s->lon);
   sprintf(ptr + strlen(ptr), "<a target=\"_empty\" href=\"https://www.google.com/maps/search/?api=1&query=%.6f,%.6f\">Google</a></td></tr>", s->lat, s->lon);
 
@@ -1207,6 +1207,16 @@ void SetupAsyncServer() {
     handleControlPost(request);
     request->send(200, "text/html", createControlForm());
   });
+
+
+
+
+ server.on("/reboot", HTTP_GET, [](AsyncWebServerRequest * request) {
+   request->send(200, "text/html", "REBOOT EN COURS ");
+delay(2000);   
+    ESP.restart();
+  });
+
 
   server.on("/file", HTTP_GET,  [](AsyncWebServerRequest * request) {
     String url = request->url();
@@ -3058,10 +3068,55 @@ void loop() {
   }
 #endif
 
- if ( millis() > 86400*1000 ) {  ESP.restart();  }
- ArduinoOTA.handle();
+ if ( millis() > 43200*1000 ) {  ESP.restart();  }
+ 	
+ 	
+ 	
+
+
+
+ if  ( millis() - time_last_update_ota  >=  1000 )
+ { 
+
+   ArduinoOTA.handle();
+time_last_update_ota = millis();
+}
+
+
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
